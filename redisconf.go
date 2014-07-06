@@ -3,6 +3,7 @@ package goredisconf
 import (
 	"fmt"
 	"strings"
+	"errors"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -14,26 +15,26 @@ type Question struct {
 }
 
 
-func ReadConfig(namespace string) (map[string]string){
+func ReadConfig(namespace string) (map[string]string, error){
 	c, err := redis.Dial("tcp", ":6379")
 	config := make(map[string]string)
 	if err != nil {
-		panic(err)
+		return config, errors.New("redis connection error")
 	}
 	defer c.Close()
 	keys, err := redis.Strings(c.Do("KEYS", fmt.Sprintf("%s.*", namespace)))
 	
 	if err != nil {
-		fmt.Println("no keys found")
+		return config, errors.New("no keys found")
 	}
 	for _, key := range keys {
 		value, err := redis.String(c.Do("GET", key))
 		if err != nil {
-			fmt.Println("key error", key)
+			return config, errors.New(fmt.Sprintf("key error %s", key))
 		}
 		config[strings.Replace(key, fmt.Sprintf("%s.", namespace), "", -1)] = value
 	}
-	return config
+	return config, nil
 }
 
 
