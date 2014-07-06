@@ -8,10 +8,10 @@ import (
 )
 
 type Question struct {
-	key string
-	question string
-	default_value string
-	is_password bool
+	Key string
+	Question string
+	Default_value string
+	Is_password bool
 }
 
 
@@ -46,9 +46,9 @@ func SetConfig(namespace string, questions []Question) {
 	}
 	for _,question := range questions {
 		var i string
-	    fmt.Println(question.question)
+	    fmt.Println(question.Question)
 	    fmt.Scan(&i)
-	    c.Do("SET", fmt.Sprintf("%s.%s", namespace, question.key), i)
+	    c.Do("SET", fmt.Sprintf("%s.%s", namespace, question.Key), i)
 	}
 }
 
